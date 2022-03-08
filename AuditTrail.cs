@@ -28,6 +28,8 @@ public class AuditTrail : MonoBehaviour
 
     void Update()
     {
+        //TEST
+
         //if (Input.GetKey(KeyCode.LeftControl))
         //{
             if (Input.GetKeyDown(KeyCode.Z))
