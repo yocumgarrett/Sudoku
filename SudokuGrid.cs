@@ -237,7 +237,6 @@ public class SudokuGrid : MonoBehaviour
     {
         GameEvents.OnSquareSelected += OnSquareSelected;
         GameEvents.OnCheckSolution += OnCheckSolution;
-        GameEvents.OnUpdateSquareNumber += OnUpdateSquareNumber;
         GameEvents.OnSettingUpdated += OnSettingUpdated;
     }
 
@@ -245,7 +244,6 @@ public class SudokuGrid : MonoBehaviour
     {
         GameEvents.OnSquareSelected -= OnSquareSelected;
         GameEvents.OnCheckSolution -= OnCheckSolution;
-        GameEvents.OnUpdateSquareNumber -= OnUpdateSquareNumber;
         GameEvents.OnSettingUpdated -= OnSettingUpdated;
     }
 
@@ -286,31 +284,6 @@ public class SudokuGrid : MonoBehaviour
             Debug.Log("not quite right");
     }
 
-    // THIS IS GETTING ORDERED BEFORE THE NUMBER GETS UPDATED, NOT SURE WHY. MAYBE ITS ONENABLE FIRST SO IT RUNS FIRST.
-    public void OnUpdateSquareNumber(int num)
-    {
-        if (show_duplicates)
-        {
-            for (int i = 0; i < gridSquares.Count; i++)
-            {
-                var current_num = gridSquares[i].GetComponent<GridSquare>().GetNumber();
-                for (int j = 0;  j < gridSquares.Count; j++)
-                {
-                    if (gridSquares[j].GetComponent<GridSquare>().GetNumber() == current_num && 
-                        gridSquares[j].GetComponent<GridSquare>().IsSameRegion(gridSquares[i]) &&
-                        gridSquares[j].GetComponent<GridSquare>().GetTextColor() != Color.red &&
-                        j != i)
-                    {
-                        gridSquares[i].GetComponent<GridSquare>().SetTextColor(Color.red);
-                        gridSquares[j].GetComponent<GridSquare>().SetTextColor(Color.red);
-                    }
-                    // else set color to base text color?
-                }
-            }
-        }
-        //Debug.Log("show duplicates for index " + selected_index);
-    }
-
     public void ShowIdentical()
     {
         for (int i = 0; i < gridSquares.Count; i++)
@@ -336,9 +309,6 @@ public class SudokuGrid : MonoBehaviour
     {
         switch (setting)
         {
-            case 3:
-                show_duplicates = !show_duplicates;
-                break;
             case 4:
                 show_identical = !show_identical;
                 break;

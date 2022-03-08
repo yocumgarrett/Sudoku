@@ -29,6 +29,8 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
     private bool track_mistakes = true;
     private bool remove_notes = true;
     private bool show_identical = true;
+    private bool show_duplicates = true;
+    private bool is_duplicate = false;
 
     // SETS
     public void SetSquareIndex(int index) { squareIndex = index; }
@@ -63,6 +65,14 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
         DisplayText();
     }
     public void SetTextColor(Color text_color) { numberText.GetComponent<Text>().color = text_color; }
+    public void SetDuplicate(bool _is_duplicate)
+    {
+        is_duplicate = _is_duplicate;
+        if (is_duplicate)
+            SetTextColor(Color.red);
+        else
+            SetTextColor(baseTextColor);
+    }
 
     // GETS
     public int GetSquareIndex() { return squareIndex; }
@@ -87,6 +97,7 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
     public bool GetNote(int index) { return Notes[index].activeSelf; }
     public int GetNumber() { return number; }
     public Color GetTextColor() { return numberText.GetComponent<Text>().color; }
+    public bool GetDuplicate() { return is_duplicate; }
 
     void Start()
     {
@@ -294,6 +305,29 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
             if (notes_mode && num > 0)
                 HideShowNotes(num - 1);
         }
+
+        if (show_duplicates)
+        {
+            Show_Duplicates();
+        }
+    }
+
+    // FIRST TRY AT SHOW_DUPLICATES. NEED TO REDESIGN, THIS DOESN'T WORK
+    public void Show_Duplicates()
+    {
+        var squares = GameObject.FindGameObjectsWithTag("GridSquare");
+        foreach (var square in squares)
+        {
+            if (square.GetComponent<GridSquare>().GetNumber() == number &&
+                IsSameRegion(square) &&
+                square.GetComponent<GridSquare>().GetSquareIndex() != squareIndex)
+            {
+                SetDuplicate(true);
+                square.GetComponent<GridSquare>().SetDuplicate(true);
+            }
+            else
+                square.GetComponent<GridSquare>().SetDuplicate(false);
+        }
     }
 
     public void HideShowNotes(int i)
@@ -362,6 +396,9 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
             case 2:
                 track_mistakes = !track_mistakes;
                 break;
+            case 3:
+                show_duplicates = !show_duplicates;
+                break;
             case 4:
                 show_identical = !show_identical;
                 break;
@@ -399,6 +436,11 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
                         square.GetComponent<GridSquare>().SetNote(old_num - 1, true);
                 }
             }
+        }
+
+        if (show_duplicates)
+        {
+            Show_Duplicates();
         }
     }
 }
