@@ -237,14 +237,14 @@ public class SudokuGrid : MonoBehaviour
     {
         GameEvents.OnSquareSelected += OnSquareSelected;
         GameEvents.OnCheckSolution += OnCheckSolution;
-        GameEvents.OnSettingUpdated += OnSettingUpdated;
+        GameEvents.OnShowDuplicates += OnShowDuplicates;
     }
 
     public void OnDisable()
     {
         GameEvents.OnSquareSelected -= OnSquareSelected;
         GameEvents.OnCheckSolution -= OnCheckSolution;
-        GameEvents.OnSettingUpdated -= OnSettingUpdated;
+        GameEvents.OnShowDuplicates -= OnShowDuplicates;
     }
 
     public void OnSquareSelected(int square_index)
@@ -252,12 +252,6 @@ public class SudokuGrid : MonoBehaviour
         selected_index = square_index;
         selected_row = selected_index / 9;
         selected_col = selected_index % 9;
-
-        if (show_identical)
-        {
-            ShowIdentical();
-        }
-        //Debug.Log("show identical vals and region for index " + selected_index);
     }
 
     public void OnCheckSolution()
@@ -284,34 +278,34 @@ public class SudokuGrid : MonoBehaviour
             Debug.Log("not quite right");
     }
 
-    public void ShowIdentical()
+    public void OnShowDuplicates()
     {
         for (int i = 0; i < gridSquares.Count; i++)
         {
-            var current_num = gridSquares[i].GetComponent<GridSquare>().GetNumber();
-            var selected_num = gridSquares[selected_index].GetComponent<GridSquare>().GetNumber();
-            if (current_num == selected_num && selected_num > 0)
+            gridSquares[i].GetComponent<GridSquare>().SetDuplicate(false);
+            var num = gridSquares[i].GetComponent<GridSquare>().GetNumber();
+
+            if (num > 0)
             {
-                // HIGHLIGHT AS THE SAME NUMBER
-            }
-            else if (gridSquares[selected_index].GetComponent<GridSquare>().IsSameRegion(gridSquares[i]))
-            {
-                // HIGHLIGHT AS THE SAME REGION
-            }
-            else
-            {
-                // RESET COLORING AS THE BASE COLORING
+                for (int j = 0; j < gridSquares.Count; j++)
+                {
+                    if (gridSquares[j].GetComponent<GridSquare>().GetNumber() == num &&
+                        i != j &&
+                        gridSquares[j].GetComponent<GridSquare>().IsSameRegion(gridSquares[i]))
+                    {
+                        gridSquares[i].GetComponent<GridSquare>().SetDuplicate(true);
+                    }
+
+                }
             }
         }
-    }
 
-    public void OnSettingUpdated(int setting)
-    {
-        switch (setting)
+        for (int i = 0; i < gridSquares.Count; i++)
         {
-            case 4:
-                show_identical = !show_identical;
-                break;
+            if (gridSquares[i].GetComponent<GridSquare>().GetDuplicate() == true)
+                gridSquares[i].GetComponent<GridSquare>().SetTextColor(Color.red);
+            else
+                gridSquares[i].GetComponent<GridSquare>().SetTextColor(gridSquares[i].GetComponent<GridSquare>().GetBaseTextColor());
         }
     }
 }

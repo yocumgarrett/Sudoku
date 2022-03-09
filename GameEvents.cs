@@ -113,4 +113,13 @@ public class GameEvents : MonoBehaviour
         if (OnCheckSolution != null)
             OnCheckSolution();
     }
+
+    public delegate void ShowDuplicates();
+    public static event ShowDuplicates OnShowDuplicates;
+
+    public static void ShowDuplicatesMethod()
+    {
+        if (OnShowDuplicates != null)
+            OnShowDuplicates();
+    }
 }

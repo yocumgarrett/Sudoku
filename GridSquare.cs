@@ -90,6 +90,7 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
     public bool GetNote(int index) { return Notes[index].activeSelf; }
     public int GetNumber() { return number; }
     public Color GetTextColor() { return numberText.GetComponent<Text>().color; }
+    public Color GetBaseTextColor() { return baseTextColor; }
     public bool GetDuplicate() { return is_duplicate; }
 
     void Start()
@@ -302,6 +303,10 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
             // NOTES MODE AND NUMBER > 0
             if (notes_mode && num > 0)
                 HideShowNotes(num - 1);
+
+            // TRIGGER EVENT TO SHOW DUPLICATES
+            if (show_duplicates)
+                GameEvents.ShowDuplicatesMethod();
         }
     }
 
@@ -320,26 +325,6 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
                 num > 0)
                 Debug.Log("for index " + squareIndex + " duplicate value " + num + " at index " + square.GetComponent<GridSquare>().GetSquareIndex());
         }
-
-        /*
-         * var squares = GameObject.FindGameObjectsWithTag("GridSquare");
-        foreach (var square in squares)
-        {
-            if (square.GetComponent<GridSquare>().GetNumber() == num &&
-                IsSameRegion(square) &&
-                num > 0 &&
-                square.GetComponent<GridSquare>().GetSquareIndex() != squareIndex)
-            {
-                SetDuplicate(true);
-                square.GetComponent<GridSquare>().SetDuplicate(true);
-            }
-        }
-
-        if (is_duplicate)
-            SetTextColor(Color.red);
-        else
-            SetTextColor(baseTextColor);
-            */
     }
 
     public void HideShowNotes(int i)
@@ -451,8 +436,6 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
         }
 
         if (show_duplicates)
-        {
-            Show_Duplicates(num);
-        }
+            GameEvents.ShowDuplicatesMethod();
     }
 }
