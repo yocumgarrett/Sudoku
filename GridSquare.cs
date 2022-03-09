@@ -65,14 +65,7 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
         DisplayText();
     }
     public void SetTextColor(Color text_color) { numberText.GetComponent<Text>().color = text_color; }
-    public void SetDuplicate(bool _is_duplicate)
-    {
-        is_duplicate = _is_duplicate;
-        if (is_duplicate)
-            SetTextColor(Color.red);
-        else
-            SetTextColor(baseTextColor);
-    }
+    public void SetDuplicate(bool _is_duplicate) { is_duplicate = _is_duplicate; }
 
     // GETS
     public int GetSquareIndex() { return squareIndex; }
@@ -299,35 +292,54 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
                     }
                 }
                 GameEvents.UpdateAuditTrailMethod(squareIndex, old_num, number, notes_mode, old_notes, removed_notes_at);
+
+                if (show_duplicates)
+                {
+                    Show_Duplicates(num);
+                }
             }
 
             // NOTES MODE AND NUMBER > 0
             if (notes_mode && num > 0)
                 HideShowNotes(num - 1);
         }
-
-        if (show_duplicates)
-        {
-            Show_Duplicates();
-        }
     }
 
-    // FIRST TRY AT SHOW_DUPLICATES. NEED TO REDESIGN, THIS DOESN'T WORK
-    public void Show_Duplicates()
+    // ISSUE: THIS RUNS ON CELLS OF LOWER INDEX BEFORE THE CHANGED NUMBER ENTRY, THUS SHOWING DUPLICATES OF PREVIOUS ON LOWER INDEXED CELLS
+    // ALSO, NEED TO FIND A WAY TO INDICATE THAT IT'S A DUPLICATE, RUN FOR ALL CELLS, THEN DO NOT REMOVE A DUPLICATE OTHERWISE!! ARGHH!!
+    public void Show_Duplicates(int num)
     {
+        is_duplicate = false;
         var squares = GameObject.FindGameObjectsWithTag("GridSquare");
+
         foreach (var square in squares)
         {
-            if (square.GetComponent<GridSquare>().GetNumber() == number &&
+            if (square.GetComponent<GridSquare>().GetNumber() == num &&
+                square.GetComponent<GridSquare>().GetSquareIndex() != squareIndex &&
                 IsSameRegion(square) &&
+                num > 0)
+                Debug.Log("for index " + squareIndex + " duplicate value " + num + " at index " + square.GetComponent<GridSquare>().GetSquareIndex());
+        }
+
+        /*
+         * var squares = GameObject.FindGameObjectsWithTag("GridSquare");
+        foreach (var square in squares)
+        {
+            if (square.GetComponent<GridSquare>().GetNumber() == num &&
+                IsSameRegion(square) &&
+                num > 0 &&
                 square.GetComponent<GridSquare>().GetSquareIndex() != squareIndex)
             {
                 SetDuplicate(true);
                 square.GetComponent<GridSquare>().SetDuplicate(true);
             }
-            else
-                square.GetComponent<GridSquare>().SetDuplicate(false);
         }
+
+        if (is_duplicate)
+            SetTextColor(Color.red);
+        else
+            SetTextColor(baseTextColor);
+            */
     }
 
     public void HideShowNotes(int i)
@@ -440,7 +452,7 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
 
         if (show_duplicates)
         {
-            Show_Duplicates();
+            Show_Duplicates(num);
         }
     }
 }

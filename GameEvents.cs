@@ -14,7 +14,7 @@ public class GameEvents : MonoBehaviour
         if (OnUpdateSquareNumber != null)
             OnUpdateSquareNumber(number);
     }
-    // test
+    
     public delegate void UpdateAuditTrail(int index, int old_num, int new_num, bool notes, bool[] old_notes, List<int> removed_notes);
     public static event UpdateAuditTrail OnUpdateAuditTrail;
 
