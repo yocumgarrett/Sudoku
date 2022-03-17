@@ -13,6 +13,8 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
     private Color baseTextColor = Color.black;
     private ColorBlock baseColors = new ColorBlock();
     public float opacity_level = 1f;
+    public AudioSource audioUpdated;
+    public AudioClip[] numberClips;
 
     // SQUARE VALUES
     private int squareIndex = -1;
@@ -63,6 +65,7 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
     {
         number = num;
         DisplayText();
+        //audioUpdated.Play();
     }
     public void SetTextColor(Color text_color) { numberText.GetComponent<Text>().color = text_color; }
     public void SetDuplicate(bool _is_duplicate) { is_duplicate = _is_duplicate; }
@@ -96,6 +99,7 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
     void Start()
     {
         baseColors = this.colors;
+        audioUpdated = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -262,6 +266,8 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
                 var old_num = number;
                 bool[] old_notes = new bool[9];
                 List<int> removed_notes_at = new List<int>();
+                audioUpdated.clip = numberClips[num - 1];
+                audioUpdated.Play();
                 SetNumber(num);
                 for (int i = 0; i < Notes.Length; i++)
                 {

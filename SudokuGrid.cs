@@ -32,6 +32,9 @@ public class SudokuGrid : MonoBehaviour
     private bool show_duplicates = true;
     private bool show_identical = true;
 
+    // SOUNDS
+    public AudioSource puzzleStarted;
+
     void Start()
     {
         if (gridSquare.GetComponent<GridSquare>() == null)
@@ -39,6 +42,8 @@ public class SudokuGrid : MonoBehaviour
 
         CreateGrid();
         SetGridNumber(MenuButtons.difficulty);
+
+        puzzleStarted.Play();
     }
 
     void Update()
