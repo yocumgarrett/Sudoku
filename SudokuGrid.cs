@@ -33,7 +33,8 @@ public class SudokuGrid : MonoBehaviour
     private bool show_identical = true;
 
     // SOUNDS
-    public AudioSource puzzleStarted;
+    public AudioSource checkSolutionAudio;
+    public AudioClip[] checkSolutionClips;
 
     void Start()
     {
@@ -42,8 +43,6 @@ public class SudokuGrid : MonoBehaviour
 
         CreateGrid();
         SetGridNumber(MenuButtons.difficulty);
-
-        puzzleStarted.Play();
     }
 
     void Update()
@@ -276,11 +275,17 @@ public class SudokuGrid : MonoBehaviour
         {
             // GAME WON
             CameraUIMethods.GetComponent<UIMethods>().SetPauseStatus(true);
+            checkSolutionAudio.clip = checkSolutionClips[0];
+            checkSolutionAudio.Play();
             Debug.Log("you win!");
             GameEvents.GameEndedMethod();
         }
         else
+        {
+            checkSolutionAudio.clip = checkSolutionClips[1];
+            checkSolutionAudio.Play();
             Debug.Log("not quite right");
+        }
     }
 
     public void OnShowDuplicates()
@@ -309,7 +314,8 @@ public class SudokuGrid : MonoBehaviour
         {
             if (gridSquares[i].GetComponent<GridSquare>().GetDuplicate() == true)
                 gridSquares[i].GetComponent<GridSquare>().SetTextColor(Color.red);
-            else
+            else if(gridSquares[i].GetComponent<GridSquare>().GetNumber() == gridSquares[i].GetComponent<GridSquare>().GetCorrectNumber() ||
+                    gridSquares[i].GetComponent<GridSquare>().GetNumber() == 0)
                 gridSquares[i].GetComponent<GridSquare>().SetTextColor(gridSquares[i].GetComponent<GridSquare>().GetBaseTextColor());
         }
     }

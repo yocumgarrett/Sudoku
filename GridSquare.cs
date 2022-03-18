@@ -15,6 +15,8 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
     public float opacity_level = 1f;
     public AudioSource audioUpdated;
     public AudioClip[] numberClips;
+    public AudioClip[] mistakeClips;
+    public AudioClip undoClip;
 
     // SQUARE VALUES
     private int squareIndex = -1;
@@ -65,7 +67,6 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
     {
         number = num;
         DisplayText();
-        //audioUpdated.Play();
     }
     public void SetTextColor(Color text_color) { numberText.GetComponent<Text>().color = text_color; }
     public void SetDuplicate(bool _is_duplicate) { is_duplicate = _is_duplicate; }
@@ -281,6 +282,9 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
                 {
                     SetTextColor(Color.red);
                     GameEvents.WrongNumberMethod();
+                    int clip_index = Random.Range(0, mistakeClips.Length);
+                    audioUpdated.clip = mistakeClips[clip_index];
+                    audioUpdated.Play();
                 }
                 else
                     SetTextColor(baseTextColor);
@@ -299,11 +303,6 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
                     }
                 }
                 GameEvents.UpdateAuditTrailMethod(squareIndex, old_num, number, notes_mode, old_notes, removed_notes_at);
-
-                if (show_duplicates)
-                {
-                    Show_Duplicates(num);
-                }
             }
 
             // NOTES MODE AND NUMBER > 0
@@ -313,23 +312,6 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
             // TRIGGER EVENT TO SHOW DUPLICATES
             if (show_duplicates)
                 GameEvents.ShowDuplicatesMethod();
-        }
-    }
-
-    // ISSUE: THIS RUNS ON CELLS OF LOWER INDEX BEFORE THE CHANGED NUMBER ENTRY, THUS SHOWING DUPLICATES OF PREVIOUS ON LOWER INDEXED CELLS
-    // ALSO, NEED TO FIND A WAY TO INDICATE THAT IT'S A DUPLICATE, RUN FOR ALL CELLS, THEN DO NOT REMOVE A DUPLICATE OTHERWISE!! ARGHH!!
-    public void Show_Duplicates(int num)
-    {
-        is_duplicate = false;
-        var squares = GameObject.FindGameObjectsWithTag("GridSquare");
-
-        foreach (var square in squares)
-        {
-            if (square.GetComponent<GridSquare>().GetNumber() == num &&
-                square.GetComponent<GridSquare>().GetSquareIndex() != squareIndex &&
-                IsSameRegion(square) &&
-                num > 0)
-                Debug.Log("for index " + squareIndex + " duplicate value " + num + " at index " + square.GetComponent<GridSquare>().GetSquareIndex());
         }
     }
 
@@ -423,6 +405,8 @@ public class GridSquare : Selectable, ISelectHandler, IPointerClickHandler, ISub
     {
         if (selected)
         {
+            audioUpdated.clip = undoClip;
+            audioUpdated.Play();
             SetNumber(num);
             if (number != correct_number && number > 0 && track_mistakes)
                 SetTextColor(Color.red);
